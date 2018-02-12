@@ -1,0 +1,32 @@
+{
+  "name": "PingPong",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IQ-Inc/PingPong.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IQ-Inc/PingPong/issues"
+  },
+  "homepage": "https://github.com/IQ-Inc/PingPong#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "morgan": "^1.9.0",
+    "pg": "^7.4.1",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.33.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.12"
+  }
+}
