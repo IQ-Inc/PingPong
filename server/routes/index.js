@@ -1,3 +1,4 @@
+const gamesController = require('../controllers').games;
 const playersController = require('../controllers').players;
 
 module.exports = (app) => {
@@ -6,4 +7,6 @@ module.exports = (app) => {
   }));
 
   app.post('/api/players', playersController.create);
+  app.get('/api/players', playersController.list);
+  app.post('/api/games', gamesController.create);
 };

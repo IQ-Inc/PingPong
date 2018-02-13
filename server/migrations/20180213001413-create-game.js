@@ -7,8 +7,8 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      IsTournament: {
-        type: Sequelize.STRING,
+      IsTournamentGame: {
+        type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
       LoserScore: {
@@ -19,9 +19,13 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       WinnerId: {
         type: Sequelize.INTEGER,
