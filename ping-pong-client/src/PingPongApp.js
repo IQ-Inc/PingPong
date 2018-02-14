@@ -51,14 +51,10 @@ class PingPongApp extends Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        FirstName: this.FirstName,
-        LastName: this.LastName,
+        FirstName: this.FirstName.value,
+        LastName: this.LastName.value,
       })
-    })
-    .then(result=>result.json())
-      .then(players=> {
-        console.log(players);        
-      })
+    });
   }
 
   render() {
