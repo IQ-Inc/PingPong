@@ -1,10 +1,10 @@
 {
   "development": {
-    "host": "iq-ping-pong.c7jaq1whjogi.us-east-2.rds.amazonaws.com",
+    "host": "127.0.0.1",
     "dialect":"postgres",
-    "username":"administrator",
-    "password":"iqincoffice4071",
-    "database":"ping_pong"
+    "username":"user",
+    "password":"password",
+    "database":"db"
   },
   "test": {
     "username": "root",
