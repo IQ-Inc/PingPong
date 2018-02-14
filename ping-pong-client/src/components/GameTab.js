@@ -13,7 +13,6 @@ class GameTab extends Component {
   constructor() {
     super();
     this.state={
-      players:[], 
       selectedPlayer1: null,
       selectedPlayer2: null
     };   
@@ -41,19 +40,9 @@ class GameTab extends Component {
       LoserScore: this.player1Score.value > this.player2Score.value ? this.player2Score.value : this.player1Score.value,
       IsTournamentGame: false,
     };
-    console.log(game);
-    axios.post('http://localhost:8081/api/games', game);
-  }
-  
-  componentDidMount() {  
-    axios.get(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players`)
-      .then(res => {
-        let players = res.data;
-        this.setState({
-          ...this.state,
-          players: [...players]
-        });  
-      })
+    axios.post('http://localhost:8081/api/games', game).then(res=>{
+      this.props.loadGames();
+    });
   }
 
   render() {
@@ -67,7 +56,7 @@ class GameTab extends Component {
             searchable={true}
             clearable={true}
             onChange={this.selectPlayer1}
-            options={this.state.players.map(player => 
+            options={this.props.players.map(player => 
               {
                 return {value: player.id, label: player.FirstName + " " + player.LastName };
               }
@@ -85,7 +74,7 @@ class GameTab extends Component {
             searchable={true}
             clearable={true}
             onChange={this.selectPlayer2}
-            options={this.state.players.map(player => 
+            options={this.props.players.map(player => 
               {
                 return {value: player.id, label: player.FirstName + " " + player.LastName };
               }

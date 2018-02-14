@@ -11,6 +11,7 @@ import { Button,
 class CreatePlayerTab extends Component {
   constructor() {
       super();
+      this.state={}
   }
 
   createPlayer = () => {
@@ -18,7 +19,10 @@ class CreatePlayerTab extends Component {
       FirstName: this.FirstName.value,
       LastName: this.LastName.value,
     };
-    axios.post('http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players', player);
+    axios.post('http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players', player)
+    .then(res => {
+      this.props.loadPlayers();
+    });
   }
 
   render() {

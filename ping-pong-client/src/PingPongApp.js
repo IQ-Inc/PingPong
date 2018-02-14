@@ -17,7 +17,39 @@ import { Button,
 
 class PingPongApp extends Component {
   constructor() {
-  	super();
+    super();
+    this.state = {
+      players: [],
+      games: []
+    }
+    this.loadGames = this.loadGames.bind(this);
+    this.loadPlayers = this.loadGames.bind(this);
+  }
+  
+  componentDidMount() {  
+    this.loadPlayers();
+    this.loadGames();
+  }
+
+  loadGames() {  
+    axios.get(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/games`)
+      .then(res => {
+        this.setState({
+          ...this.state,
+          games: [...res.data]
+        })      
+      })
+    
+  }
+
+  loadPlayers() {
+    axios.get(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players`)
+      .then(res => {
+        this.setState({
+          ...this.state,
+          players: [...res.data]
+        }) 
+      })
   }
 
   render() {
@@ -29,13 +61,26 @@ class PingPongApp extends Component {
         </header>        
         <Tabs defaultActiveKey={1} id="ping-pong-tabs">
           <Tab eventKey={1} title="Game"> 
-            <GameTab />
+
+            <GameTab 
+              players={this.state.players}
+              loadGames={this.loadGames}
+            />
+
           </Tab>
           <Tab eventKey={2} title="Create Player"> 
-            <CreatePlayerTab />
+
+            <CreatePlayerTab
+              loadPlayers={this.loadPlayers}
+            />
+
           </Tab>
           <Tab eventKey={3} title="Statistics"> 
-            <StatisticsTab />
+
+            <StatisticsTab 
+              games={this.state.games} 
+            />
+
           </Tab>
         </Tabs>          
       </div>
