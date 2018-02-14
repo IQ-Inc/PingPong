@@ -8,12 +8,12 @@ class PingPongApp extends Component {
     this.state={players:[]};
   }
   componentDidMount() {    
-    fetch(`http://node-express-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players`)
+    fetch(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players`)
       .then(result=>result.json())
       .then(players=> {
         this.setState({
           ...this.state,
-          players: players
+          players: [...players]
         });        
       })
   }
