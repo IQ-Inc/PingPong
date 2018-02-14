@@ -15,12 +15,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 require('./server/routes')(app);
 // Setup a default catch-all route that sends back a welcome message in JSON format.
 app.get('*', (req, res) => res.status(200).send({
-  message: 'This is the default data from the PingPong server.',
+  message: 'Welcome to the default data from the PingPong server.',
 }));
 
 const http = require('http');
 const port = parseInt(process.env.PORT, 10) || 8081;
 app.set('port', port);
+console.log("Starting API server on port", port);
 const server = http.createServer(app);
 server.listen(port);
 
