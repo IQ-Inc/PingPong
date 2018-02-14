@@ -2,10 +2,10 @@
   "name": "PingPong",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "nodemon ./bin/www",
+    "start:dev": "nodemon main.js",
     "start": "node main.js"
   },
   "repository": {
