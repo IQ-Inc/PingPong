@@ -23,7 +23,7 @@ class PingPongApp extends Component {
       games: []
     }
     this.loadGames = this.loadGames.bind(this);
-    this.loadPlayers = this.loadGames.bind(this);
+    this.loadPlayers = this.loadPlayers.bind(this);
   }
   
   componentDidMount() {  
