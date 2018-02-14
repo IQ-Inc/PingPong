@@ -4,7 +4,11 @@ module.exports = {
   create(req, res) {
     return Game
       .create({
-        ...req.body
+        WinnerId: req.body.WinnerId,
+        LoserId: req.body.LoserId,
+        WinnerScore: req.body.WinnerScore,
+        LoserScore: req.body.LoserScore,
+        IsTournamentGame: req.body.IsTournamentGame,
       })
       .then(game => res.status(201).send(game))
       .catch(error => res.status(400).send(error));
