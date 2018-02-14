@@ -14,13 +14,31 @@ module.exports = {
   },
   list(req, res) {
     return Player
-      .findAll({
-        include: [{
+      .findAll()
+      .then(players => res.status(200).send(players))
+      .catch(error => res.status(400).send(error));
+  },
+  retrieve(req, res) {
+    return Player
+      .findById(req.params.playerId, {
+        include: [
+        {
           model: Game,
-          as: 'games',
+          as: 'GamesWon',
+        },
+        {
+          model: Game,
+          as: 'GamesLost'
         }],
       })
-      .then(players => res.status(200).send(players))
+      .then(player => {
+        if (!player) {
+          return res.status(404).send({
+            message: 'Player Not Found',
+          });
+        }
+        return res.status(200).send(todo);
+      })
       .catch(error => res.status(400).send(error));
   },
 };

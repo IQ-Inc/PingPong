@@ -8,5 +8,7 @@ module.exports = (app) => {
 
   app.post('/api/players', playersController.create);
   app.get('/api/players', playersController.list);
+  app.get('/api/players/:playerId', playersController.retrieve);
   app.post('/api/games', gamesController.create);
+  app.get('/api/games', gamesController.list);
 };

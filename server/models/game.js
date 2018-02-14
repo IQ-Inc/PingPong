@@ -16,14 +16,8 @@ module.exports = (sequelize, DataTypes) => {
 
 
   Game.associate = (models) => {
-    Game.belongsTo(models.Player, {
-      foreignKey: 'WinnerId',
-      onDelete: 'CASCADE',
-    });
-    Game.belongsTo( models.Player, {
-      foreignKey: 'LoserId',
-      onDelete: 'CASCADE',
-    });
+    Game.belongsTo(models.Player, {foreignKey : 'WinnerId'});
+    Game.belongsTo(models.Player, {foreignKey : 'LoserId'});
   };
   return Game;
 };

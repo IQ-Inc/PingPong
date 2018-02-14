@@ -29,7 +29,6 @@ module.exports = {
       },
       WinnerId: {
         type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
         references: {
           model: 'Players',
           key: 'id',
@@ -38,7 +37,6 @@ module.exports = {
       },
       LoserId: {
         type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
         references: {
           model: 'Players',
           key: 'id',
