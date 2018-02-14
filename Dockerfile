@@ -1,5 +1,5 @@
 FROM node:8.9
 RUN mkdir /code
 WORKDIR /code
-ADD . /code/
+ADD package.json .
 RUN npm install
