@@ -1,3 +1,5 @@
+# See additional notes in the Dockerfile - Ian
+
 version: '3'
 
 services:
