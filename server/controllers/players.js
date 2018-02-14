@@ -37,7 +37,7 @@ module.exports = {
             message: 'Player Not Found',
           });
         }
-        return res.status(200).send(todo);
+        return res.status(200).send(player);
       })
       .catch(error => res.status(400).send(error));
   },
