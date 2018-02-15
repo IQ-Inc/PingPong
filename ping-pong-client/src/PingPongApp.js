@@ -1,61 +1,58 @@
 import React, { Component } from 'react';
-import logo from './images/logo.svg';
+import logo from './static/logo.svg';
 import './style/App.css';
-import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-
+import axios from 'axios';
+import CreatePlayerTab from './components/CreatePlayerTab';
+import GameTab from './components/GameTab';
+import StatisticsTab from './components/StatisticsTab';
 import { Button, 
   FormControl, 
   FormGroup,
   Row,
-  Col
+  Col,
+  Tabs,
+  Tab
 } from 'react-bootstrap';
+import {
+  server_url
+} from './static/constants'
 
 class PingPongApp extends Component {
   constructor() {
-  	super();
-    this.state={
-      players:[], 
-      selectedPlayer1: null,
-      selectedPlayer2: null
-    };
-  }
-  selectPlayer1 = (player) => {
-    this.setState({
-      ...this.state,
-      selectedPlayer1: player
-    });
-  }
-  selectPlayer2 = (player) => {
-    this.setState({
-      ...this.state,
-      selectedPlayer2: player
-    });
+    super();
+    this.state = {
+      players: [],
+      games: []
+    }
+    this.loadGames = this.loadGames.bind(this);
+    this.loadPlayers = this.loadPlayers.bind(this);
   }
   
-  componentDidMount() {    
-    fetch(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players`)
-      .then(result=>result.json())
-      .then(players=> {
-        this.setState({
-          ...this.state,
-          players: [...players]
-        });        
-      })
+  componentDidMount() {  
+    this.loadPlayers();
+    this.loadGames();
   }
 
-  createPlayer = (player) => {
-    fetch('http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        FirstName: this.FirstName.value,
-        LastName: this.LastName.value,
+  loadGames() {  
+    axios.get(server_url + "api/games ")
+      .then(res => {
+        this.setState({
+          ...this.state,
+          games: [...res.data]
+        })      
       })
-    });
+    
+  }
+
+  loadPlayers() {
+    axios.get(server_url + "api/players")
+      .then(res => {
+        this.setState({
+          ...this.state,
+          players: [...res.data]
+        }) 
+      })
   }
 
   render() {
@@ -64,54 +61,31 @@ class PingPongApp extends Component {
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to the Ping Pong App</h1>
-        </header>
-        <Row>
-          <Col md={6}>
-            Choose Player 1
-            <Select
-              name="form-field-name"
-              value={this.state.selectedPlayer1}
-              searchable={true}
-              clearable={true}
-              onChange={this.selectPlayer1}
-              options={this.state.players.map(player => 
-                {
-                  return {value: player.id, label: player.FirstName + " " + player.LastName };
-                }
-              )}
+        </header>        
+        <Tabs defaultActiveKey={1} id="ping-pong-tabs">
+          <Tab eventKey={1} title="Game"> 
+
+            <GameTab 
+              players={this.state.players}
+              loadGames={this.loadGames}
             />
-          </Col>
-          <Col md={6}>    
-            Choose Player 2
-            <Select
-              name="form-field-name"
-              value={this.state.selectedPlayer2}
-              searchable={true}
-              clearable={true}
-              onChange={this.selectPlayer2}
-              options={this.state.players.map(player => 
-                {
-                  return {value: player.id, label: player.FirstName + " " + player.LastName };
-                }
-              )}
+
+          </Tab>
+          <Tab eventKey={2} title="Create Player"> 
+
+            <CreatePlayerTab
+              loadPlayers={this.loadPlayers}
             />
-          </Col>
-        </Row>
-        <Row>
-        <form onSubmit={this.createPlayer}>
-          <Col md={4}>
-            <FormGroup>
-              <FormControl placeholder="First Name" inputRef={ref => { this.FirstName = ref; }} />
-            </FormGroup>
-          </Col>
-          <Col md={4}>
-            <FormGroup>
-              <FormControl placeholder="Last Name" inputRef={ref => { this.LastName = ref; }} />
-            </FormGroup>
-          </Col>
-          <Col md={4}><Button type="submit">Create Player</Button></Col>
-        </form>
-        </Row>
+
+          </Tab>
+          <Tab eventKey={3} title="Statistics"> 
+
+            <StatisticsTab 
+              games={this.state.games} 
+            />
+
+          </Tab>
+        </Tabs>          
       </div>
     );
   }
