@@ -35,7 +35,7 @@ class PingPongApp extends Component {
   }
 
   loadGames() {  
-    axios.get(server_url + "api/games")
+    axios.get(server_url + "api/games ")
       .then(res => {
         this.setState({
           ...this.state,
