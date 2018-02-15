@@ -13,7 +13,7 @@ services:
       - db-data:/var/lib/postgresql/data
   api:
     build: .
-    command: bash -c "npm run migrations && npm run start:dev"
+    command: bash -c "./wait-for-it.sh database:5432 -- npm run migrations && npm run start:dev"
     volumes:
       - .:/code
     ports:
