@@ -22,9 +22,25 @@
   font-size: large;
 }
 
+.player-name {
+  height: 42px;
+  color: white;
+  font-size: 30px;
+}
+
+.submit-game-button-row {
+  margin-top: -350px;
+}
+
+.submit-game-button {
+  height: 100px;
+  background: black;
+  color: white;
+}
+
 .score {
-  font-size: 100px;
-  height: 200px;
+  font-size: 180px;
+  height: 312px;
   font-family: 'ScoreboardFont';
   color: white;
 }
@@ -51,20 +67,18 @@
 }
 
 .game-area {
-  height: 700px;
+  height: 800px;
 }
 
-.up-button {
-  margin-right: 15px;
-  font-size: 100px;  
+.score-button {
+  margin: 0;
+  font-size: 100px;
   color: white;
   cursor: pointer;
-}
-
-.down-button {
-  font-size: 50px;
-  color: white;
-  cursor: pointer;
+  border-top: 2px solid white;
+  border-bottom: 2px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid white; 
 }
 
 @keyframes App-logo-spin {
