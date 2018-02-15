@@ -14,6 +14,9 @@ import { Button,
   Tabs,
   Tab
 } from 'react-bootstrap';
+import {
+  server_url
+} from './static/constants'
 
 class PingPongApp extends Component {
   constructor() {
@@ -32,7 +35,7 @@ class PingPongApp extends Component {
   }
 
   loadGames() {  
-    axios.get(`http://localhost:8081/api/games`)
+    axios.get(server_url + "api/games")
       .then(res => {
         this.setState({
           ...this.state,
@@ -43,7 +46,7 @@ class PingPongApp extends Component {
   }
 
   loadPlayers() {
-    axios.get(`http://localhost:8081/api/players`)
+    axios.get(server_url + "api/players")
       .then(res => {
         this.setState({
           ...this.state,

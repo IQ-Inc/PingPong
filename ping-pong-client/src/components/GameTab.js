@@ -8,6 +8,9 @@ import { Button,
   Tab,
 } from 'react-bootstrap';
 import Select from 'react-select';
+import {
+  server_url
+} from '../static/constants';
 
 class GameTab extends Component {
   constructor() {
@@ -80,7 +83,7 @@ class GameTab extends Component {
       IsTournamentGame: false,
     };
     console.log(game);
-    axios.post('http://localhost:8081/api/games', game).then(res=>{
+    axios.post(server_url + "api/games", game).then(res=>{
       this.props.loadGames();
       this.resetAfterWin(this.state.player1Score > this.state.player2Score);
     });

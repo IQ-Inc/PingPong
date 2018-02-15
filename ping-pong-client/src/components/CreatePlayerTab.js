@@ -7,6 +7,9 @@ import { Button,
   Col,
   Tab
 } from 'react-bootstrap';
+import {
+  server_url
+} from '../static/constants';
 
 class CreatePlayerTab extends Component {
   constructor() {
@@ -19,7 +22,7 @@ class CreatePlayerTab extends Component {
       FirstName: this.FirstName.value,
       LastName: this.LastName.value,
     };
-    axios.post('http://localhost:8081/api/players', player)
+    axios.post(server_url + "api/players", player)
     .then(res => {
       this.props.loadPlayers();
     });
