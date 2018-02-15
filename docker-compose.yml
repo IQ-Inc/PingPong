@@ -1,0 +1,25 @@
+# See additional notes in the Dockerfile - Ian
+
+version: '3'
+
+services:
+  database:
+    image: postgres:10.2
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  api:
+    build: .
+    command: bash -c "./wait-for-it.sh database:5432 -- npm run migrations && npm run start:dev"
+    volumes:
+      - .:/code
+    ports:
+      - "8081:8081"
+    depends_on:
+      - database
+
+volumes:
+  db-data:
