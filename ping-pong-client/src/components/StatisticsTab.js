@@ -11,31 +11,16 @@ import { Button,
 class StatisticsTab extends Component {
   constructor() {
      super();
-     this.state={
-        games:[], 
-    };  
-  }
-
-  componentDidMount() {  
-    axios.get(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/games`)
-      .then(res => {
-        let games = res.data;
-        this.setState({
-          ...this.state,
-          games: [...games]
-        });  
-      })
-  }
+     this.state={}
+  } 
 
   render() {
     return (
-      <form onSubmit={this.createPlayer}>
         <Row>
-            {this.state.games.map(game => 
-              <div key={game.id}> {"Winner: " + game.WinnerId + " Loser: " + game.LoserId} </div>
+            {this.props.games.map(game => 
+                <div key={game.id}> {"Winner: " + game.WinnerId + " Loser: " + game.LoserId} </div>
             )}
         </Row>
-      </form>
     );
   }
 }

@@ -5,17 +5,21 @@ import { Button,
   FormGroup,
   Row,
   Col,
-  Tab
+  Tab,
 } from 'react-bootstrap';
 import Select from 'react-select';
+import {
+  server_url
+} from '../static/constants';
 
 class GameTab extends Component {
   constructor() {
     super();
     this.state={
-      players:[], 
-      selectedPlayer1: null,
-      selectedPlayer2: null
+      selectedPlayer1: {label: ""},
+      selectedPlayer2: {label: ""},
+      player1Score: 0,
+      player2Score: 0
     };   
   }
 
@@ -32,73 +36,118 @@ class GameTab extends Component {
       selectedPlayer2: player
     });
   }
+  
+  scorePlayer1 = (up) => {
+    if(!up && this.state.player1Score == 0)
+      return;
+    this.setState( {
+      ...this.state,
+      player1Score: up ? this.state.player1Score + 1 : this.state.player1Score - 1
+    })
+  }
+
+  scorePlayer2 = (up) => {
+    if(!up && this.state.player2Score == 0)
+      return;
+    this.setState( {
+      ...this.state,
+      player2Score: up ? this.state.player2Score + 1 : this.state.player2Score - 1
+    })
+  }
+
+  resetAfterWin = (playerOneWon) => {
+    if(playerOneWon) {
+      this.setState({
+        ...this.state,
+        player2Score: 0,
+        player1Score: 0,
+        selectedPlayer2: {label: ""}
+      });
+    }
+    else {
+      this.setState({
+        ...this.state,
+        player2Score: 0,
+        player1Score: 0,
+        selectedPlayer1: {label: ""}
+      });
+    }
+  }
 
   submitGame = () => {
     let game = {
-      WinnerId: this.player1Score.value > this.player2Score.value ? this.state.selectedPlayer1.value : this.state.selectedPlayer2.value,
-      LoserId: this.player1Score.value > this.player2Score.value ? this.state.selectedPlayer2.value : this.state.selectedPlayer1.value,
-      WinnerScore: this.player1Score.value > this.player2Score.value ? this.player1Score.value : this.player2Score.value,
-      LoserScore: this.player1Score.value > this.player2Score.value ? this.player2Score.value : this.player1Score.value,
+      WinnerId: this.state.player1Score > this.state.player2Score ? this.state.selectedPlayer1.value : this.state.selectedPlayer2.value,
+      LoserId: this.state.player1Score > this.state.player2Score ? this.state.selectedPlayer2.value : this.state.selectedPlayer1.value,
+      WinnerScore: this.state.player1Score > this.state.player2Score ? this.state.player1Score : this.state.player2Score,
+      LoserScore: this.state.player1Score > this.state.player2Score ? this.state.player2Score : this.state.player1Score,
       IsTournamentGame: false,
     };
     console.log(game);
-    axios.post('http://localhost:8081/api/games', game);
-  }
-  
-  componentDidMount() {  
-    axios.get(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players`)
-      .then(res => {
-        let players = res.data;
-        this.setState({
-          ...this.state,
-          players: [...players]
-        });  
-      })
+    axios.post(server_url + "api/games", game).then(res=>{
+      this.props.loadGames();
+      this.resetAfterWin(this.state.player1Score > this.state.player2Score);
+    });
   }
 
   render() {
     return (
-       <Row>
-        <Col md={2}>
-          Choose Player 1
-          <Select
-            name="form-field-name"
-            value={this.state.selectedPlayer1}
-            searchable={true}
-            clearable={true}
-            onChange={this.selectPlayer1}
-            options={this.state.players.map(player => 
-              {
-                return {value: player.id, label: player.FirstName + " " + player.LastName };
-              }
-            )}
-          />
-          <FormGroup>
-            <FormControl placeholder="Score" type="number" inputRef={ref => { this.player1Score = ref; }} />
-          </FormGroup>
-        </Col>
-        <Col md={2}>    
-          Choose Player 2
-          <Select
-            name="form-field-name"
-            value={this.state.selectedPlayer2}
-            searchable={true}
-            clearable={true}
-            onChange={this.selectPlayer2}
-            options={this.state.players.map(player => 
-              {
-                return {value: player.id, label: player.FirstName + " " + player.LastName };
-              }
-            )}
-          />
-          <FormGroup>
-            <FormControl placeholder="Score" type="number" inputRef={ref => { this.player2Score = ref; }} />
-          </FormGroup>
-        </Col>
-        <Col md={8}>
-          <Button onClick={this.submitGame}>Submit Game</Button>
-        </Col>
-      </Row>
+      <div>
+        <Row>
+          <Col className="player-area one" md={6}> 
+            <Row className="player-name">{this.state.selectedPlayer1.label}</Row>           
+            <Row className="score">{this.state.player1Score}</Row>
+            <Row>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer1(false)}>-</Col>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer1(true)}>+</Col>
+            </Row>
+          </Col>
+          <Col className="player-area two" md={6}> 
+            <Row className="player-name">{this.state.selectedPlayer2.label}</Row>    
+            <Row className="score">{this.state.player2Score}</Row>
+            <Row>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer2(false)}>-</Col>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer2(true)}>+</Col>
+            </Row>
+          </Col>
+        </Row>   
+        <Row>                    
+          <Col className="submit-game-button-row" md={12}>
+            <Button className="submit-game-button" onClick={this.submitGame}>Submit Game</Button>
+          </Col>  
+        </Row>
+        <Row>
+          <Col md={6} className="player-select">
+            <Select
+              name="form-field-name"
+              placeholder="Select Player"
+              value={this.state.selectedPlayer1}
+              searchable={true}
+              clearable={true}
+              onChange={this.selectPlayer1}
+              options={this.props.players.map(player => 
+                {
+                  return {value: player.id, label: player.FirstName + " " + player.LastName };
+                }
+              )}
+            />
+          </Col>
+          <Col md={6} className="player-select">
+            <Select
+              name="form-field-name"
+              placeholder="Select Player"
+              value={this.state.selectedPlayer2}
+              searchable={true}
+              clearable={true}
+              onChange={this.selectPlayer2}
+              options={this.props.players.map(player => 
+                {
+                  return {value: player.id, label: player.FirstName + " " + player.LastName };
+                }
+              )}
+            />
+          </Col>
+        </Row>
+      </div>
     );
   }
 }
