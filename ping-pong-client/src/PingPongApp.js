@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './images/logo.svg';
+import logo from './static/logo.svg';
 import './style/App.css';
 import 'react-select/dist/react-select.css';
 import axios from 'axios';
@@ -32,7 +32,7 @@ class PingPongApp extends Component {
   }
 
   loadGames() {  
-    axios.get(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/games`)
+    axios.get(`http://localhost:8081/api/games`)
       .then(res => {
         this.setState({
           ...this.state,
@@ -43,7 +43,7 @@ class PingPongApp extends Component {
   }
 
   loadPlayers() {
-    axios.get(`http://ping-pong-env.qtiruet3fh.us-east-2.elasticbeanstalk.com/api/players`)
+    axios.get(`http://localhost:8081/api/players`)
       .then(res => {
         this.setState({
           ...this.state,

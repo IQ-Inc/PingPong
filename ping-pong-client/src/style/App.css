@@ -22,7 +22,57 @@
   font-size: large;
 }
 
+.score {
+  font-size: 100px;
+  height: 200px;
+  font-family: 'ScoreboardFont';
+  color: white;
+}
+
+.player-select {
+  align-content: center;
+}
+
+.player-select > div{
+  width: 300px;
+  display: inline-block;
+}
+
+.player-area {
+  height: 500px;
+}
+
+.player-area.one {
+  background: red;
+}
+
+.player-area.two {
+  background: blue;
+}
+
+.game-area {
+  height: 700px;
+}
+
+.up-button {
+  margin-right: 15px;
+  font-size: 100px;  
+  color: white;
+  cursor: pointer;
+}
+
+.down-button {
+  font-size: 50px;
+  color: white;
+  cursor: pointer;
+}
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@font-face {
+  font-family: 'ScoreboardFont'; /*a name to be used later*/
+  src: url('digital-7.ttf'); /*URL to font*/
 }
