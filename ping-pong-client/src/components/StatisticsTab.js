@@ -1,11 +1,6 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import { Button, 
-  FormControl, 
-  FormGroup,
-  Row,
-  Col,
-  Tab
+import { 
+  Row
 } from 'react-bootstrap';
 
 class StatisticsTab extends Component {

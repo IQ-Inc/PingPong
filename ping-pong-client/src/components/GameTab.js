@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Button, 
-  FormControl, 
-  FormGroup,
   Row,
   Col,
-  Tab,
 } from 'react-bootstrap';
 import Select from 'react-select';
 import {
@@ -16,29 +13,36 @@ class GameTab extends Component {
   constructor() {
     super();
     this.state={
-      selectedPlayer1: {label: ""},
-      selectedPlayer2: {label: ""},
       player1Score: 0,
-      player2Score: 0
+      player2Score: 0,
+      player1: {id: 0},
+      player2: {id: 0},
     };   
+
+    this.selectPlayer1 = this.selectPlayer1.bind(this);
+    this.selectPlayer2 = this.selectPlayer2.bind(this);
   }
 
   selectPlayer1 = (player) => {
-    this.setState({
-      ...this.state,
-      selectedPlayer1: player
+    axios.get(server_url + "api/players/" + player.value).then(res=>{
+      this.setState({
+        ...this.state,
+        player1: res.data
+      });
     });
   }
 
   selectPlayer2 = (player) => {
-    this.setState({
-      ...this.state,  
-      selectedPlayer2: player
+    axios.get(server_url + "api/players/" + player.value).then(res=>{
+      this.setState({
+        ...this.state,
+        player2: res.data
+      });
     });
   }
   
   scorePlayer1 = (up) => {
-    if(!up && this.state.player1Score == 0)
+    if(!up && this.state.player1Score === 0)
       return;
     this.setState( {
       ...this.state,
@@ -47,7 +51,7 @@ class GameTab extends Component {
   }
 
   scorePlayer2 = (up) => {
-    if(!up && this.state.player2Score == 0)
+    if(!up && this.state.player2Score === 0)
       return;
     this.setState( {
       ...this.state,
@@ -61,7 +65,7 @@ class GameTab extends Component {
         ...this.state,
         player2Score: 0,
         player1Score: 0,
-        selectedPlayer2: {label: ""}
+        player2: {id: 0}
       });
     }
     else {
@@ -69,15 +73,15 @@ class GameTab extends Component {
         ...this.state,
         player2Score: 0,
         player1Score: 0,
-        selectedPlayer1: {label: ""}
+        player1: {id: 0}
       });
     }
   }
 
   submitGame = () => {
     let game = {
-      WinnerId: this.state.player1Score > this.state.player2Score ? this.state.selectedPlayer1.value : this.state.selectedPlayer2.value,
-      LoserId: this.state.player1Score > this.state.player2Score ? this.state.selectedPlayer2.value : this.state.selectedPlayer1.value,
+      WinnerId: this.state.player1Score > this.state.player2Score ? this.state.player1.value : this.state.player2.value,
+      LoserId: this.state.player1Score > this.state.player2Score ? this.state.player2.value : this.state.player1.value,
       WinnerScore: this.state.player1Score > this.state.player2Score ? this.state.player1Score : this.state.player2Score,
       LoserScore: this.state.player1Score > this.state.player2Score ? this.state.player2Score : this.state.player1Score,
       IsTournamentGame: false,
@@ -89,12 +93,17 @@ class GameTab extends Component {
     });
   }
 
+  formatPlayerString = (player) => {
+    console.log(player);
+    return player.id === 0 ? "Select Player" : player.FirstName + " " + player.LastName + " " + player.GamesWon.length + "W" + player.GamesLost.length + "L";
+  }
+
   render() {
     return (
       <div>
         <Row>
           <Col className="player-area one" md={6}> 
-            <Row className="player-name">{this.state.selectedPlayer1.label}</Row>           
+            <Row className="player-name">{this.formatPlayerString(this.state.player1)}</Row>           
             <Row className="score">{this.state.player1Score}</Row>
             <Row>
               <Col md={6} className="score-button" onClick={() =>this.scorePlayer1(false)}>-</Col>
@@ -102,7 +111,7 @@ class GameTab extends Component {
             </Row>
           </Col>
           <Col className="player-area two" md={6}> 
-            <Row className="player-name">{this.state.selectedPlayer2.label}</Row>    
+            <Row className="player-name">{this.formatPlayerString(this.state.player2)}</Row>    
             <Row className="score">{this.state.player2Score}</Row>
             <Row>
               <Col md={6} className="score-button" onClick={() =>this.scorePlayer2(false)}>-</Col>
@@ -120,7 +129,7 @@ class GameTab extends Component {
             <Select
               name="form-field-name"
               placeholder="Select Player"
-              value={this.state.selectedPlayer1}
+              value={this.state.player1.id}
               searchable={true}
               clearable={true}
               onChange={this.selectPlayer1}
@@ -135,7 +144,7 @@ class GameTab extends Component {
             <Select
               name="form-field-name"
               placeholder="Select Player"
-              value={this.state.selectedPlayer2}
+              value={this.state.player2.id}
               searchable={true}
               clearable={true}
               onChange={this.selectPlayer2}

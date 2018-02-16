@@ -6,11 +6,7 @@ import axios from 'axios';
 import CreatePlayerTab from './components/CreatePlayerTab';
 import GameTab from './components/GameTab';
 import StatisticsTab from './components/StatisticsTab';
-import { Button, 
-  FormControl, 
-  FormGroup,
-  Row,
-  Col,
+import {
   Tabs,
   Tab
 } from 'react-bootstrap';
