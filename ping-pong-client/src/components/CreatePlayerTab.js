@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button, 
   FormControl, 
   FormGroup,
-  Col,
+  Col
 } from 'react-bootstrap';
 import {
   server_url

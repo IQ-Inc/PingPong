@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Button, 
+import {
   Row,
   Col,
 } from 'react-bootstrap';
@@ -17,10 +17,20 @@ class GameTab extends Component {
       player2Score: 0,
       player1: {id: 0},
       player2: {id: 0},
+      activePlayers: [],
+      nextPlayer: 0
     };   
 
     this.selectPlayer1 = this.selectPlayer1.bind(this);
     this.selectPlayer2 = this.selectPlayer2.bind(this);
+    this.addPlayerToEnd = this.addPlayerToEnd.bind(this);
+  }
+
+  addPlayerToEnd = (player) => {
+    this.setState({
+      ...this.state,
+      activePlayers: [...this.state.activePlayers,  player]
+    });
   }
 
   selectPlayer1 = (player) => {
@@ -29,6 +39,9 @@ class GameTab extends Component {
         ...this.state,
         player1: res.data
       });
+      if(this.state.activePlayers.map(p=>p.id).indexOf(res.data.id) === -1) {
+        this.addPlayerToEnd(res.data);
+      }
     });
   }
 
@@ -38,6 +51,9 @@ class GameTab extends Component {
         ...this.state,
         player2: res.data
       });
+      if(this.state.activePlayers.map(p=>p.id).indexOf(res.data.id) === -1) {
+        this.addPlayerToEnd(res.data);
+      }
     });
   }
   
@@ -59,71 +75,85 @@ class GameTab extends Component {
     })
   }
 
-  resetAfterWin = (playerOneWon) => {
+  nextPlayer = (playerOneWon) => {
     if(playerOneWon) {
       this.setState({
         ...this.state,
         player2Score: 0,
         player1Score: 0,
-        player2: {id: 0}
+        player2: this.state.activePlayers[0],
       });
+      this.selectPlayer1({value: this.state.player1.id});
     }
     else {
       this.setState({
         ...this.state,
         player2Score: 0,
         player1Score: 0,
-        player1: {id: 0}
+        player1: this.state.activePlayers[0],
       });
+      this.selectPlayer2({value: this.state.player2.id});
     }
+    let newArray = JSON.parse(JSON.stringify(this.state.activePlayers));
+    var temp = newArray.shift();
+    newArray.push(temp);
+    this.setState({
+      ...this.state,
+      activePlayers: newArray
+    });
   }
 
   submitGame = () => {
     let game = {
-      WinnerId: this.state.player1Score > this.state.player2Score ? this.state.player1.value : this.state.player2.value,
-      LoserId: this.state.player1Score > this.state.player2Score ? this.state.player2.value : this.state.player1.value,
+      WinnerId: this.state.player1Score > this.state.player2Score ? this.state.player1.id : this.state.player2.id,
+      LoserId: this.state.player1Score > this.state.player2Score ? this.state.player2.id : this.state.player1.id,
       WinnerScore: this.state.player1Score > this.state.player2Score ? this.state.player1Score : this.state.player2Score,
       LoserScore: this.state.player1Score > this.state.player2Score ? this.state.player2Score : this.state.player1Score,
       IsTournamentGame: false,
     };
-    console.log(game);
     axios.post(server_url + "api/games", game).then(res=>{
       this.props.loadGames();
-      this.resetAfterWin(this.state.player1Score > this.state.player2Score);
+      this.nextPlayer(this.state.player1Score > this.state.player2Score);
     });
   }
 
   formatPlayerString = (player) => {
     console.log(player);
-    return player.id === 0 ? "Select Player" : player.FirstName + " " + player.LastName + " " + player.GamesWon.length + "W" + player.GamesLost.length + "L";
+    return player.id === 0 ? 
+      "Select Player" 
+      : 
+      player.FirstName + " " + player.LastName + " " + player.GamesWon.length + "W" + player.GamesLost.length + "L\n";
   }
 
   render() {
     return (
       <div>
         <Row>
-          <Col className="player-area one" md={6}> 
+          <Col className="player-area one" md={5}> 
             <Row className="player-name">{this.formatPlayerString(this.state.player1)}</Row>           
             <Row className="score">{this.state.player1Score}</Row>
             <Row>
-              <Col md={6} className="score-button" onClick={() =>this.scorePlayer1(false)}>-</Col>
-              <Col md={6} className="score-button" onClick={() =>this.scorePlayer1(true)}>+</Col>
+              <Col md={2} onClick={() =>this.nextPlayer(false)} className="skip score-button">SKIP</Col>
+              <Col md={5} className="score-button" onClick={() =>this.scorePlayer1(false)}>-</Col>
+              <Col md={5} className="score-button" onClick={() =>this.scorePlayer1(true)}>+</Col>
             </Row>
-          </Col>
-          <Col className="player-area two" md={6}> 
+          </Col>                 
+          <Col className="game-middle-col" md={2}>
+            <Row className="submit-game-button" onClick={this.submitGame}>Submit</Row>
+            {this.state.activePlayers.map(player =>                 
+                <Row className="active-player" key={player.id}>{player.FirstName + " " + player.LastName}</Row>
+            )}
+          </Col> 
+          <Col className="player-area two" md={5}> 
             <Row className="player-name">{this.formatPlayerString(this.state.player2)}</Row>    
             <Row className="score">{this.state.player2Score}</Row>
             <Row>
-              <Col md={6} className="score-button" onClick={() =>this.scorePlayer2(false)}>-</Col>
-              <Col md={6} className="score-button" onClick={() =>this.scorePlayer2(true)}>+</Col>
+              <Col md={5} className="score-button" onClick={() =>this.scorePlayer2(false)}>-</Col>
+              <Col md={5} className="score-button" onClick={() =>this.scorePlayer2(true)}>+</Col>
+              <Col md={2} onClick={() =>this.nextPlayer(false)} className="skip score-button">SKIP</Col>
             </Row>
           </Col>
-        </Row>   
-        <Row>                    
-          <Col className="submit-game-button-row" md={12}>
-            <Button className="submit-game-button" onClick={this.submitGame}>Submit Game</Button>
-          </Col>  
-        </Row>
+        </Row> 
         <Row>
           <Col md={6} className="player-select">
             <Select
