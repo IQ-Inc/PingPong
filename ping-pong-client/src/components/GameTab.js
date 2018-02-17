@@ -16,6 +16,7 @@ class GameTab extends Component {
       player1Score: 0,
       player2Score: 0,
       player1: {id: 0},
+      addPlayer: {id: 0},
       player2: {id: 0},
       activePlayers: [],
       nextPlayer: 0
@@ -24,6 +25,10 @@ class GameTab extends Component {
     this.selectPlayer1 = this.selectPlayer1.bind(this);
     this.selectPlayer2 = this.selectPlayer2.bind(this);
     this.addPlayerToEnd = this.addPlayerToEnd.bind(this);
+    this.addPlayerToBeginning = this.addPlayerToBeginning.bind(this);
+    this.movePlayerToEnd = this.movePlayerToEnd.bind(this);
+    this.nextPlayer = this.nextPlayer.bind(this);
+    this.swapPlayers = this.swapPlayers.bind(this);
   }
 
   addPlayerToEnd = (player) => {
@@ -31,6 +36,35 @@ class GameTab extends Component {
       ...this.state,
       activePlayers: [...this.state.activePlayers,  player]
     });
+  }
+
+  addPlayerToBeginning = (player) => {
+    this.setState({
+      ...this.state,
+      activePlayers: [ player, ...this.state.activePlayers]
+    });
+  }
+
+  swapPlayers = (index1, index2) => {
+    let newArray = JSON.parse(JSON.stringify(this.state.activePlayers));
+    let temp = newArray[index1];
+    newArray[index1] = newArray[index2];
+    newArray[index2] = temp;
+    this.setState({
+      ...this.state,
+      activePlayers: newArray
+    });
+  }
+
+  movePlayerToEnd = (player) => {
+    let currentIndex = this.state.activePlayers.map(p=>p.id).indexOf(player.id);
+    let newArray = JSON.parse(JSON.stringify(this.state.activePlayers));
+    let movingPlayer = newArray.splice(currentIndex, 1);
+    newArray.push(movingPlayer[0]);
+    this.setState({
+      ...this.state,
+      activePlayers: newArray
+    })
   }
 
   selectPlayer1 = (player) => {
@@ -76,31 +110,40 @@ class GameTab extends Component {
   }
 
   nextPlayer = (playerOneWon) => {
+    let skipAgain = (playerOneWon && this.state.player1.id === this.state.activePlayers[0].id) || (!playerOneWon && this.state.player2.id === this.state.activePlayers[0].id);
+    
     if(playerOneWon) {
       this.setState({
         ...this.state,
         player2Score: 0,
         player1Score: 0,
-        player2: this.state.activePlayers[0],
+        player2: this.state.activePlayers[skipAgain ? 1 : 0],
       });
       this.selectPlayer1({value: this.state.player1.id});
+      this.selectPlayer2({value:  this.state.activePlayers[skipAgain ? 1 : 0]});
     }
     else {
       this.setState({
         ...this.state,
         player2Score: 0,
         player1Score: 0,
-        player1: this.state.activePlayers[0],
+        player1: this.state.activePlayers[skipAgain ? 1 : 0],
       });
       this.selectPlayer2({value: this.state.player2.id});
+      this.selectPlayer1({value:  this.state.activePlayers[skipAgain ? 1 : 0]});
     }
     let newArray = JSON.parse(JSON.stringify(this.state.activePlayers));
     var temp = newArray.shift();
     newArray.push(temp);
+    if(skipAgain) {
+      temp = newArray.shift();
+      newArray.push(temp);
+    }
     this.setState({
       ...this.state,
       activePlayers: newArray
     });
+    
   }
 
   submitGame = () => {
@@ -113,7 +156,12 @@ class GameTab extends Component {
     };
     axios.post(server_url + "api/games", game).then(res=>{
       this.props.loadGames();
-      this.nextPlayer(this.state.player1Score > this.state.player2Score);
+      let playerOneWon = this.state.player1Score > this.state.player2Score;
+      let playerLost = this.state.player1;
+      if(playerOneWon)
+        playerLost = this.state.player2;
+      this.movePlayerToEnd(playerLost);
+      this.nextPlayer(playerOneWon);
     });
   }
 
@@ -155,14 +203,29 @@ class GameTab extends Component {
           </Col>
         </Row> 
         <Row>
-          <Col md={6} className="player-select">
+          <Col md={4} className="player-select">
             <Select
               name="form-field-name"
-              placeholder="Select Player"
+              placeholder="Select Player 1"
               value={this.state.player1.id}
               searchable={true}
               clearable={true}
               onChange={this.selectPlayer1}
+              options={this.state.activePlayers.map(player => 
+                {
+                  return {value: player.id, label: player.FirstName + " " + player.LastName };
+                }
+              )}
+            />
+          </Col>          
+          <Col md={4} className="player-select">
+            <Select
+              name="form-field-name"
+              placeholder="Add Player To List"
+              value={this.state.addPlayer.id}
+              searchable={true}
+              clearable={true}
+              onChange={this.addPlayerToBeginning}
               options={this.props.players.map(player => 
                 {
                   return {value: player.id, label: player.FirstName + " " + player.LastName };
@@ -170,15 +233,15 @@ class GameTab extends Component {
               )}
             />
           </Col>
-          <Col md={6} className="player-select">
+          <Col md={4} className="player-select">
             <Select
               name="form-field-name"
-              placeholder="Select Player"
+              placeholder="Select Player 2"
               value={this.state.player2.id}
               searchable={true}
               clearable={true}
               onChange={this.selectPlayer2}
-              options={this.props.players.map(player => 
+              options={this.state.activePlayers.map(player => 
                 {
                   return {value: player.id, label: player.FirstName + " " + player.LastName };
                 }
