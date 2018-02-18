@@ -35,11 +35,13 @@
 }
 
 .submit-game-button {
-  height: 100px;
-  font-size: 80px;
+  font-size: 60px;
   color: white;
   font-family: 'ScoreboardFont';  
   cursor: pointer;
+  margin: 5px;
+  border: 2px solid red;
+  padding-bottom: 20px;
 }
 
 .score {
@@ -74,11 +76,16 @@
 
 .active-player {
   color: white;
-  font-size: 20px;
+  font-size: 17px;
 }
 
 .game-area {
   height: 800px;
+}
+
+.move-order-glyph {
+  color: white;
+  cursor: pointer;
 }
 
 .score-button {

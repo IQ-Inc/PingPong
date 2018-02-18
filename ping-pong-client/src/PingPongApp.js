@@ -63,6 +63,7 @@ class PingPongApp extends Component {
 
             <GameTab 
               players={this.state.players}
+              games={this.state.games}
               loadGames={this.loadGames}
             />
 

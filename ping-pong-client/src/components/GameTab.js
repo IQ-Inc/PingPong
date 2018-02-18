@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   Row,
   Col,
+  Glyphicon
 } from 'react-bootstrap';
 import Select from 'react-select';
 import {
@@ -29,6 +30,7 @@ class GameTab extends Component {
     this.movePlayerToEnd = this.movePlayerToEnd.bind(this);
     this.nextPlayer = this.nextPlayer.bind(this);
     this.swapPlayers = this.swapPlayers.bind(this);
+    this.moveOrder = this.moveOrder.bind(this);
   }
 
   addPlayerToEnd = (player) => {
@@ -39,10 +41,12 @@ class GameTab extends Component {
   }
 
   addPlayerToBeginning = (player) => {
-    this.setState({
-      ...this.state,
-      activePlayers: [ player, ...this.state.activePlayers]
-    });
+    if(this.state.activePlayers.map(p=>p.id).indexOf(player.id) === -1) {
+      this.setState({
+        ...this.state,
+        activePlayers: [ player, ...this.state.activePlayers]
+      });
+    }    
   }
 
   swapPlayers = (index1, index2) => {
@@ -54,6 +58,16 @@ class GameTab extends Component {
       ...this.state,
       activePlayers: newArray
     });
+  }
+
+  moveOrder = (index, up) => {
+    if((up && index === 0) || (!up && index === (this.state.activePlayers.length - 1))) {
+      return;
+    }
+    if(up)
+      this.swapPlayers(index, index -1);
+    else  
+      this.swapPlayers(index, index + 1);
   }
 
   movePlayerToEnd = (player) => {
@@ -68,26 +82,20 @@ class GameTab extends Component {
   }
 
   selectPlayer1 = (player) => {
-    axios.get(server_url + "api/players/" + player.value).then(res=>{
-      this.setState({
-        ...this.state,
-        player1: res.data
-      });
-      if(this.state.activePlayers.map(p=>p.id).indexOf(res.data.id) === -1) {
-        this.addPlayerToEnd(res.data);
-      }
+    player.GamesWon = this.props.games.filter(g => g.WinnerId === player.id);
+    player.GamesLost = this.props.games.filter(g => g.LoserId === player.id);
+    this.setState({
+      ...this.state,
+      player1: {...player}
     });
   }
 
   selectPlayer2 = (player) => {
-    axios.get(server_url + "api/players/" + player.value).then(res=>{
-      this.setState({
-        ...this.state,
-        player2: res.data
-      });
-      if(this.state.activePlayers.map(p=>p.id).indexOf(res.data.id) === -1) {
-        this.addPlayerToEnd(res.data);
-      }
+    player.GamesWon = this.props.games.filter(g => g.WinnerId === player.id);
+    player.GamesLost = this.props.games.filter(g => g.LoserId === player.id);
+    this.setState({
+      ...this.state,
+      player2: {...player}
     });
   }
   
@@ -112,26 +120,16 @@ class GameTab extends Component {
   nextPlayer = (playerOneWon) => {
     let skipAgain = (playerOneWon && this.state.player1.id === this.state.activePlayers[0].id) || (!playerOneWon && this.state.player2.id === this.state.activePlayers[0].id);
     
-    if(playerOneWon) {
-      this.setState({
-        ...this.state,
-        player2Score: 0,
-        player1Score: 0,
-        player2: this.state.activePlayers[skipAgain ? 1 : 0],
-      });
-      this.selectPlayer1({value: this.state.player1.id});
-      this.selectPlayer2({value:  this.state.activePlayers[skipAgain ? 1 : 0]});
-    }
-    else {
-      this.setState({
-        ...this.state,
-        player2Score: 0,
-        player1Score: 0,
-        player1: this.state.activePlayers[skipAgain ? 1 : 0],
-      });
-      this.selectPlayer2({value: this.state.player2.id});
-      this.selectPlayer1({value:  this.state.activePlayers[skipAgain ? 1 : 0]});
-    }
+    this.setState({
+      ...this.state,
+      player2Score: 0,
+      player1Score: 0,
+    });
+    if(playerOneWon) 
+      this.selectPlayer2(this.state.activePlayers[skipAgain ? 1 : 0]);
+    else 
+      this.selectPlayer1(this.state.activePlayers[skipAgain ? 1 : 0]);
+    
     let newArray = JSON.parse(JSON.stringify(this.state.activePlayers));
     var temp = newArray.shift();
     newArray.push(temp);
@@ -146,6 +144,17 @@ class GameTab extends Component {
     
   }
 
+  skipPlayer = (skippingOne) => {
+    if(skippingOne) {
+      this.movePlayerToEnd(this.state.player1);
+      this.nextPlayer(false); 
+    }
+    else {
+      this.movePlayerToEnd(this.state.player2);
+      this.nextPlayer(true);
+    }
+  }
+
   submitGame = () => {
     let game = {
       WinnerId: this.state.player1Score > this.state.player2Score ? this.state.player1.id : this.state.player2.id,
@@ -158,15 +167,18 @@ class GameTab extends Component {
       this.props.loadGames();
       let playerOneWon = this.state.player1Score > this.state.player2Score;
       let playerLost = this.state.player1;
-      if(playerOneWon)
+      let playerWon = this.state.player2;
+      if(playerOneWon) {
         playerLost = this.state.player2;
+        playerWon = this.state.player1;
+      }
       this.movePlayerToEnd(playerLost);
+      this.movePlayerToEnd(playerWon);
       this.nextPlayer(playerOneWon);
     });
   }
 
   formatPlayerString = (player) => {
-    console.log(player);
     return player.id === 0 ? 
       "Select Player" 
       : 
@@ -181,15 +193,25 @@ class GameTab extends Component {
             <Row className="player-name">{this.formatPlayerString(this.state.player1)}</Row>           
             <Row className="score">{this.state.player1Score}</Row>
             <Row>
-              <Col md={2} onClick={() =>this.nextPlayer(false)} className="skip score-button">SKIP</Col>
+              <Col md={2} onClick={() =>this.skipPlayer(true)} className="skip score-button">SKIP</Col>
               <Col md={5} className="score-button" onClick={() =>this.scorePlayer1(false)}>-</Col>
               <Col md={5} className="score-button" onClick={() =>this.scorePlayer1(true)}>+</Col>
             </Row>
           </Col>                 
           <Col className="game-middle-col" md={2}>
             <Row className="submit-game-button" onClick={this.submitGame}>Submit</Row>
-            {this.state.activePlayers.map(player =>                 
-                <Row className="active-player" key={player.id}>{player.FirstName + " " + player.LastName}</Row>
+            {this.state.activePlayers.map((player, index) =>                 
+                <Row className="active-player" key={player.id}>
+                  <Col className="move-order-glyph" onClick={() => this.moveOrder(index, false)} md={2}>
+                    <Glyphicon glyph="menu-down" />
+                  </Col>
+                  <Col md={8}>
+                    {player.FirstName + " " + player.LastName}
+                  </Col>
+                  <Col className="move-order-glyph" onClick={() => this.moveOrder(index, true)} md={2}>
+                    <Glyphicon glyph="menu-up" />
+                  </Col>
+                </Row>
             )}
           </Col> 
           <Col className="player-area two" md={5}> 
@@ -198,7 +220,7 @@ class GameTab extends Component {
             <Row>
               <Col md={5} className="score-button" onClick={() =>this.scorePlayer2(false)}>-</Col>
               <Col md={5} className="score-button" onClick={() =>this.scorePlayer2(true)}>+</Col>
-              <Col md={2} onClick={() =>this.nextPlayer(false)} className="skip score-button">SKIP</Col>
+              <Col md={2} onClick={() =>this.skipPlayer(false)} className="skip score-button">SKIP</Col>
             </Row>
           </Col>
         </Row> 
@@ -213,7 +235,7 @@ class GameTab extends Component {
               onChange={this.selectPlayer1}
               options={this.state.activePlayers.map(player => 
                 {
-                  return {value: player.id, label: player.FirstName + " " + player.LastName };
+                  return {...player, value: player.id, label: player.FirstName + " " + player.LastName };
                 }
               )}
             />
@@ -228,7 +250,7 @@ class GameTab extends Component {
               onChange={this.addPlayerToBeginning}
               options={this.props.players.map(player => 
                 {
-                  return {value: player.id, label: player.FirstName + " " + player.LastName };
+                  return {...player, value: player.id, label: player.FirstName + " " + player.LastName };
                 }
               )}
             />
@@ -243,7 +265,7 @@ class GameTab extends Component {
               onChange={this.selectPlayer2}
               options={this.state.activePlayers.map(player => 
                 {
-                  return {value: player.id, label: player.FirstName + " " + player.LastName };
+                  return {...player, value: player.id, label: player.FirstName + " " + player.LastName };
                 }
               )}
             />
