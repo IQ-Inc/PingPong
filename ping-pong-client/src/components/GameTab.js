@@ -193,9 +193,8 @@ class GameTab extends Component {
             <Row className="player-name">{this.formatPlayerString(this.state.player1)}</Row>           
             <Row className="score">{this.state.player1Score}</Row>
             <Row>
-              <Col md={2} onClick={() =>this.skipPlayer(true)} className="skip score-button">SKIP</Col>
-              <Col md={5} className="score-button" onClick={() =>this.scorePlayer1(false)}>-</Col>
-              <Col md={5} className="score-button" onClick={() =>this.scorePlayer1(true)}>+</Col>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer1(false)}>-</Col>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer1(true)}>+</Col>
             </Row>
           </Col>                 
           <Col className="game-middle-col" md={2}>
@@ -218,9 +217,8 @@ class GameTab extends Component {
             <Row className="player-name">{this.formatPlayerString(this.state.player2)}</Row>    
             <Row className="score">{this.state.player2Score}</Row>
             <Row>
-              <Col md={5} className="score-button" onClick={() =>this.scorePlayer2(false)}>-</Col>
-              <Col md={5} className="score-button" onClick={() =>this.scorePlayer2(true)}>+</Col>
-              <Col md={2} onClick={() =>this.skipPlayer(false)} className="skip score-button">SKIP</Col>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer2(false)}>-</Col>
+              <Col md={6} className="score-button" onClick={() =>this.scorePlayer2(true)}>+</Col>
             </Row>
           </Col>
         </Row> 
