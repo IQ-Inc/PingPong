@@ -14,10 +14,11 @@ module.exports = {
         Ledger.create({
           Transaction: 0,
           Description: "",
-          PlayerId: player.Id,
+          PlayerId: player.dataValues.id,
           Active: true
+        }).then(ledger => {
+          res.status(201).send(player);
         });
-        res.status(201).send(player);
       })
       .catch(error => res.status(400).send(error));
   },
