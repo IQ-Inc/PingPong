@@ -11,15 +11,26 @@ services:
       POSTGRES_DB: db
     volumes:
       - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
   api:
     build: .
-    command: bash -c "./wait-for-it.sh database:5432 -- npm run migrations && npm run start:dev"
+    command: bash -c "./wait-for-it.sh database:5432 -- npm run migrations && npm install && npm run start:dev"
     volumes:
       - .:/code
     ports:
       - "8081:8081"
     depends_on:
       - database
-
+  frontend:
+    build: ./client
+    volumes:
+      - ./client:/code
+    command: bash -c "yarn install && yarn start"
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+      
 volumes:
   db-data:
