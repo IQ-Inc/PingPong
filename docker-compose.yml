@@ -15,7 +15,7 @@ services:
       - "5432:5432"
   api:
     build: .
-    command: bash -c "./wait-for-it.sh database:5432 -- npm run migrations && npm install && npm run start:dev"
+    command: bash -c "./wait-for-it.sh database:5432 -- npm install && npm run migrations && npm run start:dev"
     volumes:
       - .:/code
     ports:
