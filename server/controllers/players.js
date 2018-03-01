@@ -1,5 +1,6 @@
 const Player = require('../models').Player;
 const Game = require('../models').Game;
+const Ledger = require('../models').Ledger;
 
 module.exports = {
   create(req, res) {
@@ -9,7 +10,15 @@ module.exports = {
         LastName: req.body.LastName,
         NickName: req.body.NickName
       })
-      .then(player => res.status(201).send(player))
+      .then(player => {
+        Ledger.create({
+          Transaction: 0,
+          Description: "",
+          PlayerId: player.Id,
+          Active: true
+        });
+        res.status(201).send(player);
+      })
       .catch(error => res.status(400).send(error));
   },
   list(req, res) {

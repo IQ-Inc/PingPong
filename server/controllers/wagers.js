@@ -7,14 +7,12 @@ module.exports = {
         BettorId: req.body.BettorId,
         WinnerId: req.body.WinnerId,
         LoserId: req.body.LoserId,
-        WinnerScore: req.body.WinnerScore,
-        LoserScore: req.body.LoserScore,
-        IsTournamentWager: req.body.IsTournamentWager,
+        Amount: req.body.Amount,
+        Odds: req.body.Odds
       })
       .then(Wager => res.status(201).send(Wager))
       .catch(error => res.status(400).send(error));
   },
-
   list(req, res) {
     return Wager
       .findAll()
